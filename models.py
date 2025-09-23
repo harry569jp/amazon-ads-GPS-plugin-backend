@@ -1,7 +1,7 @@
 # models.py
 
 from sqlalchemy import Boolean, Column, Integer, String
-from database import Base
+from .database import Base
 from pydantic import BaseModel
 
 class User(Base):

@@ -3,7 +3,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from config import DATABASE_URL # 从 config.py 导入
+from .config import DATABASE_URL # 从 config.py 导入
 
 if not DATABASE_URL:
     raise ValueError("请通过环境变量 DATABASE_URL 设置数据库连接字符串")

@@ -4,7 +4,7 @@ from email.mime.text import MIMEText
 from email.header import Header
 import json
 import urllib.request
-from config import RESEND_API_KEY, SENDGRID_API_KEY, SMTP_SERVER, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD
+from .config import RESEND_API_KEY, SENDGRID_API_KEY, SMTP_SERVER, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD
 
 # --- 模拟邮件配置 ---
 # 警告：请不要将真实的密码硬编码在此处。
