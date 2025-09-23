@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户认证</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f4f7f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); width: 320px; }
+        h2 { text-align: center; color: #333; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; color: #555; }
+        input { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .input-group { display: flex; }
+        .input-group input { flex-grow: 1; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+        .input-group button { border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 0; }
+        button { width: 100%; padding: 0.75rem; background-color: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #a0c7e8; cursor: not-allowed; }
+        .toggle-link { text-align: center; margin-top: 1rem; }
+        .toggle-link a { color: #007bff; text-decoration: none; cursor: pointer; }
+        .message { text-align: center; margin-top: 1rem; padding: 0.5rem; border-radius: 4px; }
+        .message.error { color: #d8000c; background-color: #ffbaba; }
+        .message.success { color: #270; background-color: #dff2bf; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 登录视图 -->
+    <div id="login-view">
+        <h2>登录</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="login-email">邮箱</label>
+                <input type="email" id="login-email" required>
+            </div>
+            <div class="form-group">
+                <label for="login-password">密码</label>
+                <input type="password" id="login-password" required>
+            </div>
+            <button type="submit">登录</button>
+        </form>
+        <div class="toggle-link">
+            没有账号? <a id="show-register">立即注册</a>
+        </div>
+    </div>
+
+    <!-- 注册视图 -->
+    <div id="register-view" class="hidden">
+        <h2>注册</h2>
+        <form id="register-form">
+            <div class="form-group">
+                <label for="register-email">邮箱</label>
+                <input type="email" id="register-email" required>
+            </div>
+            <div class="form-group">
+                <label for="verification-code">验证码</label>
+                <div class="input-group">
+                    <input type="text" id="verification-code" required>
+                    <button type="button" id="send-code-btn" style="width: auto; padding: 0.75rem 1rem;">发送</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="register-password">密码</label>
+                <input type="password" id="register-password" required>
+            </div>
+            <button type="submit">注册</button>
+        </form>
+        <div class="toggle-link">
+            已有账号? <a id="show-login">立即登录</a>
+        </div>
+    </div>
+
+    <div id="message-box" class="message hidden"></div>
+</div>
+
+<script>
+    const API_BASE_URL = 'http://127.0.0.1:8000'; // 您的FastAPI后端地址
+
+    const loginView = document.getElementById('login-view');
+    const registerView = document.getElementById('register-view');
+    const showRegisterLink = document.getElementById('show-register');
+    const showLoginLink = document.getElementById('show-login');
+    const messageBox = document.getElementById('message-box');
+
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const sendCodeBtn = document.getElementById('send-code-btn');
+
+    // 切换视图
+    showRegisterLink.addEventListener('click', () => {
+        loginView.classList.add('hidden');
+        registerView.classList.remove('hidden');
+        clearMessages();
+    });
+
+    showLoginLink.addEventListener('click', () => {
+        registerView.classList.add('hidden');
+        loginView.classList.remove('hidden');
+        clearMessages();
+    });
+
+    // 显示消息
+    function showMessage(text, type = 'error') {
+        messageBox.textContent = text;
+        messageBox.className = `message ${type}`;
+    }
+
+    function clearMessages() {
+        messageBox.className = 'message hidden';
+    }
+
+    // 发送验证码
+    sendCodeBtn.addEventListener('click', async () => {
+        const email = document.getElementById('register-email').value;
+        if (!email) {
+            showMessage('请输入邮箱地址');
+            return;
+        }
+
+        sendCodeBtn.disabled = true;
+        sendCodeBtn.textContent = '发送中...';
+        clearMessages();
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/send-verification-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || '发送失败');
+            }
+
+            showMessage('验证码已发送，请在后台终端查看并填入。', 'success');
+            
+            // 倒计时
+            let countdown = 60;
+            const interval = setInterval(() => {
+                if (countdown > 0) {
+                    sendCodeBtn.textContent = `${countdown}s`;
+                    countdown--;
+                } else {
+                    clearInterval(interval);
+                    sendCodeBtn.textContent = '发送';
+                    sendCodeBtn.disabled = false;
+                }
+            }, 1000);
+
+        } catch (error) {
+            showMessage(error.message);
+            sendCodeBtn.textContent = '发送';
+            sendCodeBtn.disabled = false;
+        }
+    });
+
+    // 注册表单提交
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearMessages();
+
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        const verification_code = document.getElementById('verification-code').value;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, verification_code })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || '注册失败');
+            }
+
+            showMessage('注册成功！请登录。', 'success');
+            setTimeout(() => { // 延迟切换到登录视图
+                registerView.classList.add('hidden');
+                loginView.classList.remove('hidden');
+                document.getElementById('login-email').value = email; // 自动填充邮箱
+                clearMessages();
+            }, 2000);
+
+        } catch (error) {
+            showMessage(error.message);
+        }
+    });
+
+    // 登录表单提交
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearMessages();
+
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        // FastAPI的OAuth2PasswordRequestForm需要form-data格式
+        const formData = new URLSearchParams();
+        formData.append('username', email);
+        formData.append('password', password);
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || '登录失败');
+            }
+
+            // 登录成功，处理token
+            showMessage('登录成功！', 'success');
+            // 将token保存到chrome.storage.local，以便content.js等其他脚本可以使用
+            chrome.storage.local.set({ accessToken: data.access_token }, () => {
+                console.log('Token已保存，content.js现在可以检测到登录状态。');
+            });
+
+        } catch (error) {
+            showMessage(error.message);
+        }
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Web Framework
+fastapi
+
+# ASGI Server
+uvicorn[standard]
+
+# Database ORM and Driver
+sqlalchemy
+psycopg2-binary
+
+# Password Hashing
+passlib[bcrypt]
+
+# JWT for Authentication
+python-jose[cryptography]
+
+# Environment Variables
+python-dotenv
+python-multipart
+
+# Email Validation for Pydantic
+email-validator

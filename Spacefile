@@ -1,0 +1,21 @@
+v: 1
+
+app:
+  name: ad-tracer-backend
+  engine: python3.11
+  primary: true
+  commands:
+    - uvicorn main:app --host 0.0.0.0 --port 8000
+  env:
+    - DATABASE_URL
+    - SECRET_KEY
+    - ALLOWED_ORIGINS
+    - RESEND_API_KEY
+    - SENDGRID_API_KEY
+    - SMTP_SERVER
+    - SMTP_PORT
+    - SMTP_USERNAME
+    - SMTP_PASSWORD
+  http:
+    port: 8000
+
