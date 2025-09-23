@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 8000
 
 # 容器启动时执行的命令（优先使用平台提供的 PORT 环境变量，默认8000）
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "PYTHONPATH=. uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
