@@ -6,8 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import text
 
-import models, auth, database, verification, email_service
-from config import ALLOWED_ORIGINS
+from . import models, auth, database, verification, email_service
+from .config import ALLOWED_ORIGINS
 
 # 创建数据库表
 models.Base.metadata.create_all(bind=database.engine)

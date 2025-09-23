@@ -5,8 +5,8 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-import models, database
-from config import SECRET_KEY # 从 config.py 导入
+from . import models, database
+from .config import SECRET_KEY # 从 config.py 导入
 from datetime import datetime, timedelta, timezone
 
 # --- Configuration ---
