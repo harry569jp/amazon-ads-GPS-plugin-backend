@@ -97,10 +97,10 @@ def send_verification_code(recipient_email: str, code: str):
         print(f"邮件发送失败: {e}")
         # 如果发送失败，打印到控制台作为备用方案
         print("--- 发送邮件（备用方案）---")
-    print(f"收件人: {recipient_email}")
-    print(f"主题: {subject}")
-    print(f"内容: {body}")
-    print("-----------------------")
+        print(f"收件人: {recipient_email}")
+        print(f"主题: {subject}")
+        print(f"内容: {body}")
+        print("-----------------------")
         raise e
 
 

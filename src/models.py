@@ -27,4 +27,4 @@ class UserInDB(UserBase):
     subscription_level: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
