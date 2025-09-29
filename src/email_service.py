@@ -25,7 +25,7 @@ def send_verification_code(recipient_email: str, code: str):
     if RESEND_API_KEY:
         try:
             data = {
-                "from": "Plugin <no-reply@yourdomain.dev>",
+                "from": "Resend <onboarding@resend.dev>",
                 "to": [recipient_email],
                 "subject": subject,
                 "text": body
