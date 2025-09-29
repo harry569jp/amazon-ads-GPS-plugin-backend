@@ -25,7 +25,7 @@ def send_verification_code(recipient_email: str, code: str):
     if RESEND_API_KEY:
         try:
             data = {
-                "from": "亚马逊广告溯源插件 <noreply@NihonDeal.com>",
+                "from": "Resend <onboarding@resend.dev>",
                 "to": [recipient_email],
                 "subject": subject,
                 "text": body
